@@ -1,3 +1,5 @@
+-- Crypted#9928 - https://github.com/CryptedVR/ModuleManager
+
 --- SERVICES
 local RPS = game:GetService("ReplicatedStorage");
 
