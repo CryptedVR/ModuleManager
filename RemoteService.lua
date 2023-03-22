@@ -1,28 +1,29 @@
---- CONSTANTS
-local Huge :number = math.huge;
-
---- MODULE ESSENTIAL
-local M = {};
-local RemoteFuncs = {};
-RemoteFuncs.__index = RemoteFuncs;
-
 --- SERVICES
 local RPS = game:GetService("ReplicatedStorage");
 
 --- VARIABLES
+--/ Objects
 local Remotes = RPS:WaitForChild("Remotes");
 
+--/ Module
+local M = {};
+
+local M_Funcs = {};
+M_Funcs.__index = M_Funcs;
+
 --- FUNCTIONS
-function M.Hook(RemoteName :string)
-	local NewRemote = {};
-	setmetatable(NewRemote, RemoteFuncs);
+--/ Module Functions
+function M.Hook(RemoteName :string, Timeout :number?) -- Main function, hooks up the functions as long as a remote called "RemoteName" is within a folder called "Remotes" in ReplicatedStorage
+	local New = {};
+	setmetatable(New, M_Funcs);
 	
-	NewRemote.Remote = Remotes:WaitForChild(RemoteName, Huge);
+	New.Remote = Remotes:WaitForChild(RemoteName, Timeout);
 	
-	return NewRemote;
+	return New;
 end;
 
-function RemoteFuncs:Send(Targets :{Player}, ...) :nil
+--/ OOP Functions
+function M_Funcs:Send(Targets :{Player}, ...) :nil -- Exists for simplicity, and somewhat QOL
 	for _,Target :Player in Targets do
 		self.Remote:FireClient(Target, ...);
 	end;
@@ -30,7 +31,7 @@ function RemoteFuncs:Send(Targets :{Player}, ...) :nil
 	return;
 end;
 
-function RemoteFuncs:HookReturning(ReceiveFunction) :nil
+function M_Funcs:HookReturning(ReceiveFunction) :nil -- Waits for signals from clients, triggers function and sends whatever the function returns to the client
 	self.Remote.OnServerEvent:Connect(function(Client :Player, ...)
 		self.Remote:FireClient(Client, ReceiveFunction(Client, ...));
 	end);
@@ -38,4 +39,5 @@ function RemoteFuncs:HookReturning(ReceiveFunction) :nil
 	return;
 end;
 
+--- MODULE RETURN
 return M;
