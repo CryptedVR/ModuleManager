@@ -1,4 +1,5 @@
 -- Source Code: https://github.com/CryptedVR/ModuleManager
+-- Plugin Link: https://www.roblox.com/library/12864363301
 
 --- SERVICES
 local SS = game:GetService("ServerStorage");
