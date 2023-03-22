@@ -1,3 +1,5 @@
+-- Crypted#9928 - https://github.com/CryptedVR/ModuleManager
+
 --- SERVICES
 local DSS = game:GetService("DataStoreService");
 local D = game:GetService("Debris");
@@ -22,7 +24,7 @@ function M.New(Name :string, Scope :string?)
 end;
 
 --/ OOP Functions
-function DSFunctions:Get(Scope :string, DefaultValue :any?, SaveIfDefault :boolean?) :any -- Simply just gets data with security in place, and minor QOL features
+function M_Funcs:Get(Scope :string, DefaultValue :any?, SaveIfDefault :boolean?) :any -- Simply just gets data with security in place, and minor QOL features
 	local Success :boolean, Attempts :number, LoadedData :any = false, 0, nil;
 
 	repeat
@@ -44,7 +46,7 @@ function DSFunctions:Get(Scope :string, DefaultValue :any?, SaveIfDefault :boole
 	return LoadedData or DefaultValue;
 end;
 
-function DSFunctions:Set(Scope :string, Value :any?) :string? -- Simply just sets data with security in place
+function M_Funcs:Set(Scope :string, Value :any?) :string? -- Simply just sets data with security in place
 	local Success :boolean, Attempts :number, ErrMsg :string? = false, 0, nil;
 
 	repeat
@@ -62,7 +64,7 @@ function DSFunctions:Set(Scope :string, Value :any?) :string? -- Simply just set
 	return ErrMsg;
 end;
 
-function DSFunctions:SetThreaded(Scope :string, Value :any?) :RBXScriptSignal -- Sets data without yielding, and returning with a signal that can be connected and used to determine whether it errored or not
+function M_Funcs:SetThreaded(Scope :string, Value :any?) :RBXScriptSignal -- Sets data without yielding, and returning with a signal that can be connected and used to determine whether it errored or not
 	local ReturnEvent :BindableEvent = Instance.new("BindableEvent", script);
 	ReturnEvent.Name = Scope;
 
