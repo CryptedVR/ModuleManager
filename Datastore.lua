@@ -1,25 +1,28 @@
--- By your boy, Crypted.
+--- SERVICES
 local DSS = game:GetService("DataStoreService");
 local D = game:GetService("Debris");
 
-local M = {
-	Datastores = {},
-};
+--- VARIABLES
+--/ Module
+local M = {};
 
-local DSFunctions = {};
-DSFunctions.__index = DSFunctions;
+local M_Funcs = {};
+M_Funcs.__index = M_Funcs;
 
+--- FUNCTIONS
+--/ Module Functions
 function M.New(Name :string, Scope :string?)
-	local DS = {};
-	setmetatable(DS, DSFunctions);
-
-	DS.Datastore = DSS:GetDataStore(Name, Scope);
-	DS.MaxTries = math.huge;
-
-	return DS;
+	local New = {};
+	setmetatable(New, M_Funcs);
+	
+	New.Datastore = DSS:GetDataStore(Name, Scope);
+	New.MaxTries = math.huge;
+	
+	return New;
 end;
 
-function DSFunctions:Get(Scope :string, DefaultValue :any?, SaveIfDefault :boolean?) :any
+--/ OOP Functions
+function DSFunctions:Get(Scope :string, DefaultValue :any?, SaveIfDefault :boolean?) :any -- Simply just gets data with security in place, and minor QOL features
 	local Success :boolean, Attempts :number, LoadedData :any = false, 0, nil;
 
 	repeat
@@ -41,7 +44,7 @@ function DSFunctions:Get(Scope :string, DefaultValue :any?, SaveIfDefault :boole
 	return LoadedData or DefaultValue;
 end;
 
-function DSFunctions:Set(Scope :string, Value :any?) :string?
+function DSFunctions:Set(Scope :string, Value :any?) :string? -- Simply just sets data with security in place
 	local Success :boolean, Attempts :number, ErrMsg :string? = false, 0, nil;
 
 	repeat
@@ -59,15 +62,17 @@ function DSFunctions:Set(Scope :string, Value :any?) :string?
 	return ErrMsg;
 end;
 
-function DSFunctions:SetThreaded(Scope :string, Value :any?) :RBXScriptSignal
+function DSFunctions:SetThreaded(Scope :string, Value :any?) :RBXScriptSignal -- Sets data without yielding, and returning with a signal that can be connected and used to determine whether it errored or not
 	local ReturnEvent :BindableEvent = Instance.new("BindableEvent", script);
 	ReturnEvent.Name = Scope;
 
 	task.spawn(function()
+		D:AddItem(ReturnEvent, 1);
 		ReturnEvent:Fire(self:Set(Scope, Value));
 	end);
 
 	return ReturnEvent.Event;
 end;
 
+--- MODULE RETURN
 return M;
