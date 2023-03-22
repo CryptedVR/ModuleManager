@@ -1,37 +1,37 @@
---- CONSTANTS
-local Huge :number = math.huge;
-
---- MODULE ESSENTIAL
-local M = {};
-local RemoteFuncs = {};
-RemoteFuncs.__index = RemoteFuncs;
-
 --- SERVICES
 local RPS = game:GetService("ReplicatedStorage");
 
 --- VARIABLES
+--/ OBJECTS
 local Remotes = RPS:WaitForChild("Remotes");
 
+--/ MODULE
+local M = {};
+
+local M_Funcs = {};
+M_Funcs.__index = M_Funcs;
+
 --- FUNCTIONS
-function M.Hook(RemoteName :string)
-	local NewRemote = {};
-	setmetatable(NewRemote, RemoteFuncs);
+--/ Module Functions
+function M.Hook(RemoteName :string, Timeout :number?) -- Main function, hooks up the functions as long as a remote called "RemoteName" is within a folder called "Remotes" in ReplicatedStorage
+	local New = {};
+	setmetatable(New, RemoteFuncs);
 	
-	NewRemote.Remote = Remotes:WaitForChild(RemoteName, Huge);
+	New.Remote = Remotes:WaitForChild(RemoteName, Timeout);
 	
-	return NewRemote;
+	return New;
 end;
 
-function RemoteFuncs:Send(...) :nil
+--/ OOP Functions
+function M_Funcs:Send(...) :nil -- Exists for simplicity
 	self.Remote:FireServer(...);
-	
 	return;
 end;
 
-function RemoteFuncs:Get(...) :any
+function M_Funcs:Get(...) :any -- Sends a request to Server, yields until response
 	self.Remote:FireServer(...);
-	
 	return self.Remote.OnClientEvent:Wait();
 end;
 
+--- MODULE RETURN
 return M;
