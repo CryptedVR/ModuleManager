@@ -1,1 +1,1 @@
-RemotesService
+RemoteService
