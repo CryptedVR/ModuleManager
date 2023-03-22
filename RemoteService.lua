@@ -2,10 +2,10 @@
 local RPS = game:GetService("ReplicatedStorage");
 
 --- VARIABLES
---/ OBJECTS
+--/ Objects
 local Remotes = RPS:WaitForChild("Remotes");
 
---/ MODULE
+--/ Module
 local M = {};
 
 local M_Funcs = {};
@@ -15,7 +15,7 @@ M_Funcs.__index = M_Funcs;
 --/ Module Functions
 function M.Hook(RemoteName :string, Timeout :number?) -- Main function, hooks up the functions as long as a remote called "RemoteName" is within a folder called "Remotes" in ReplicatedStorage
 	local New = {};
-	setmetatable(New, RemoteFuncs);
+	setmetatable(New, M_Funcs);
 	
 	New.Remote = Remotes:WaitForChild(RemoteName, Timeout);
 	
