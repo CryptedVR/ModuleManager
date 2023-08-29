@@ -4,18 +4,15 @@
 local DSS = game:GetService("DataStoreService");
 local D = game:GetService("Debris");
 
---- VARIABLES
---/ Module
+--- CONSTANTS
 local M = {};
 
-local M_Funcs = {};
-M_Funcs.__index = M_Funcs;
-
 --- FUNCTIONS
---/ Module Functions
+local _M = {};
+_M.__index = _M;
+
 function M.New(Name :string, Scope :string?)
-	local New = {};
-	setmetatable(New, M_Funcs);
+	local New = setmetatable({}, _M);
 	
 	New.Datastore = DSS:GetDataStore(Name, Scope);
 	New.MaxTries = math.huge;
@@ -24,7 +21,7 @@ function M.New(Name :string, Scope :string?)
 end;
 
 --/ OOP Functions
-function M_Funcs:Get(Scope :string, DefaultValue :any?, SaveIfDefault :boolean?) :any -- Simply just gets data with security in place, and minor QOL features
+function _M:Get(Scope :string, DefaultValue :any?, SaveIfDefault :boolean?) :any -- Simply just gets data with security in place, and minor QOL features
 	local Success :boolean, Attempts :number, LoadedData :any = false, 0, nil;
 
 	repeat
@@ -46,7 +43,7 @@ function M_Funcs:Get(Scope :string, DefaultValue :any?, SaveIfDefault :boolean?)
 	return LoadedData or DefaultValue;
 end;
 
-function M_Funcs:Set(Scope :string, Value :any?) :string? -- Simply just sets data with security in place
+function _M:Set(Scope :string, Value :any?) :string? -- Simply just sets data with security in place
 	local Success :boolean, Attempts :number, ErrMsg :string? = false, 0, nil;
 
 	repeat
@@ -64,13 +61,13 @@ function M_Funcs:Set(Scope :string, Value :any?) :string? -- Simply just sets da
 	return ErrMsg;
 end;
 
-function M_Funcs:SetThreaded(Scope :string, Value :any?) :RBXScriptSignal -- Sets data without yielding, and returning with a signal that can be connected and used to determine whether it errored or not
+function _M:SetThreaded(Scope :string, Value :any?) :RBXScriptSignal -- Sets data without yielding, and returning with a signal that can be connected and used to determine whether it errored or not
 	local ReturnEvent :BindableEvent = Instance.new("BindableEvent", script);
 	ReturnEvent.Name = Scope;
 
 	task.spawn(function()
-		D:AddItem(ReturnEvent, 1);
 		ReturnEvent:Fire(self:Set(Scope, Value));
+		D:AddItem(ReturnEvent, 1);
 	end);
 
 	return ReturnEvent.Event;
