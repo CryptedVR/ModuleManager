@@ -1,4 +1,5 @@
--- Crypted#9928 - https://github.com/CryptedVR/ModuleManager
+-- https://github.com/CryptedVR/ModuleManager
+-- Discord: crypted.gif
 
 --- SERVICES
 local DSS = game:GetService("DataStoreService");
@@ -12,15 +13,13 @@ local _M = {};
 _M.__index = _M;
 
 function M.New(Name :string, Scope :string?)
-	local New = setmetatable({}, _M);
-	
-	New.Datastore = DSS:GetDataStore(Name, Scope);
-	New.MaxTries = math.huge;
-	
-	return New;
+	return setmetatable({
+		Datastore = DSS:GetDataStore(Name .. (Scope or "")),
+		MaxTries = math.huge,
+		RetryTime = 0.5,
+	}, _M);
 end;
 
---/ OOP Functions
 function _M:Get(Scope :string, DefaultValue :any?, SaveIfDefault :boolean?) :any -- Simply just gets data with security in place, and minor QOL features
 	local Success :boolean, Attempts :number, LoadedData :any = false, 0, nil;
 
@@ -31,8 +30,8 @@ function _M:Get(Scope :string, DefaultValue :any?, SaveIfDefault :boolean?) :any
 			return self.Datastore:GetAsync(Scope);
 		end);
 
-		if not Success then -- No need to wait for a successful pcall
-			task.wait(1.5);
+		if not Success then
+			task.wait(self.RetryTime);
 		end;
 	until Success or Attempts >= self.MaxTries;
 
@@ -43,7 +42,7 @@ function _M:Get(Scope :string, DefaultValue :any?, SaveIfDefault :boolean?) :any
 	return LoadedData or DefaultValue;
 end;
 
-function _M:Set(Scope :string, Value :any?) :string? -- Simply just sets data with security in place
+function _M:Set(Scope :string, Value :any?) :string?
 	local Success :boolean, Attempts :number, ErrMsg :string? = false, 0, nil;
 
 	repeat
@@ -53,15 +52,15 @@ function _M:Set(Scope :string, Value :any?) :string? -- Simply just sets data wi
 			self.Datastore:SetAsync(Scope, Value); 
 		end);
 
-		if not Success then -- No need to wait for a successful pcall
-			task.wait(1.5);
+		if not Success then
+			task.wait(self.RetryTime);
 		end;
 	until Success or Attempts >= self.MaxTries;
 
 	return ErrMsg;
 end;
 
-function _M:SetThreaded(Scope :string, Value :any?) :RBXScriptSignal -- Sets data without yielding, and returning with a signal that can be connected and used to determine whether it errored or not
+function _M:SetThreaded(Scope :string, Value :any?) :RBXScriptSignal
 	local ReturnEvent :BindableEvent = Instance.new("BindableEvent", script);
 	ReturnEvent.Name = Scope;
 
