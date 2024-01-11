@@ -1,4 +1,5 @@
--- Crypted#9928 - https://github.com/CryptedVR/ModuleManager
+-- https://github.com/CryptedVR/ModuleManager
+-- Discord: crypted.gif
 
 --- SERVICES
 local RPS = game:GetService("ReplicatedStorage");
@@ -11,10 +12,10 @@ local M = {};
 local _M = {};
 _M.__index = _M;
 
-function M.Hook(RemoteName :string, Timeout :number?)
-	local New = setmetatable({}, _M);
-	
-	New.Remote = Remotes:WaitForChild(RemoteName, Timeout);
+function M.Hook(RemoteName :string)
+	return setmetatable({
+		Remote = Remotes:WaitForChild(RemoteName);
+	}, _M);
 	
 	return New;
 end;
