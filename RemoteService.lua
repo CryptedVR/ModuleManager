@@ -16,8 +16,6 @@ function M.Hook(RemoteName :string)
 	return setmetatable({
 		Remote = Remotes:WaitForChild(RemoteName);
 	}, _M);
-	
-	return New;
 end;
 
 function _M:Send(...) :nil
